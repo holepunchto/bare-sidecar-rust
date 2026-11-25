@@ -7,7 +7,32 @@ use sha2::{Digest, Sha256};
 
 // The SHA-256 checksums of the prebuilds attached to the release of this
 // version, which the publish workflow checks before releasing them.
-const CHECKSUMS: &[(&str, &str)] = &[];
+const CHECKSUMS: &[(&str, &str)] = &[
+    (
+        "darwin-arm64",
+        "d9864dcdbe0894b0d461b97e0ff1319cdf5726c13799e71a67652d50396954cd",
+    ),
+    (
+        "darwin-x64",
+        "691b63eca0e92f138b57302391c22d593899f2995c7e64617d99281500f9f4f9",
+    ),
+    (
+        "linux-arm64",
+        "a4ee85cb4c4d9b1ca1b009084272bca3694f1f770a9f5bc54a7c0f66c1843350",
+    ),
+    (
+        "linux-x64",
+        "d94c014070194e4cd83b9f1feb67e7f62cf41130622a069a450fffbe925b5f59",
+    ),
+    (
+        "win32-arm64",
+        "92cbddf2218ab09b2cec29abc6811a2b2144394bd006f231b8af08691e776361",
+    ),
+    (
+        "win32-x64",
+        "517b51840db5a6bc3ef34ef04ac74887cab0b9a47de28642096ab2dd50247c8f",
+    ),
+];
 
 fn main() {
     println!("cargo:rerun-if-env-changed=BARE_SIDECAR_DIR");
