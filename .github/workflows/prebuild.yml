@@ -1,0 +1,73 @@
+name: Prebuild
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: The tag of the release to prebuild, or none to only build the prebuilds
+        required: false
+permissions:
+  contents: read
+jobs:
+  prebuild:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            platform: linux
+            arch: x64
+          - os: ubuntu-22.04-arm
+            platform: linux
+            arch: arm64
+          - os: macos-15
+            platform: darwin
+            arch: x64
+          - os: macos-15
+            platform: darwin
+            arch: arm64
+          - os: windows-2022
+            platform: win32
+            arch: x64
+          - os: windows-11-arm
+            platform: win32
+            arch: arm64
+    runs-on: ${{ matrix.os }}
+    name: Build / ${{ matrix.platform }}-${{ matrix.arch }}
+    steps:
+      - uses: holepunchto/actions/bare-base@v1
+      - uses: holepunchto/actions/compile-prebuilds@v1
+        with:
+          platform: ${{ matrix.platform }}
+          arch: ${{ matrix.arch }}
+      - id: archive
+        uses: holepunchto/actions/create-archive@v1
+        with:
+          paths: prebuilds/${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.tags }}
+          format: tar.gz
+      - uses: holepunchto/actions/upload-artifact@v1
+        with:
+          name: ${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.tags }}
+          path: ${{ steps.archive.outputs.path }}
+  release:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.tag }}
+    environment:
+      name: github
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    needs: prebuild
+    name: Release
+    steps:
+      - uses: holepunchto/actions/checkout@v1
+      - uses: holepunchto/actions/download-prebuilds@v1
+        with:
+          prefix: archives
+      - uses: holepunchto/actions/attest@v1
+        with:
+          subject-path: archives/*.tar.gz
+      - uses: holepunchto/actions/create-github-release@v1
+        with:
+          draft: true
+          tag: ${{ inputs.tag }}
+          files: archives/*.tar.gz

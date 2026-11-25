@@ -1,0 +1,24 @@
+[package]
+name = "bare-sidecar"
+version = "0.0.0"
+edition = "2024"
+description = "Start and manage Bare sidecar processes from Rust"
+license = "Apache-2.0"
+repository = "https://github.com/holepunchto/bare-sidecar-rust"
+include = ["/build.rs", "/src/**/*.rs", "/LICENSE", "/NOTICE", "/README.md", "/versions.json"]
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = [
+  "Win32_Foundation",
+  "Win32_Security",
+  "Win32_Storage_FileSystem",
+  "Win32_System_IO",
+  "Win32_System_Pipes",
+  "Win32_System_Threading",
+] }
+
+[build-dependencies]
+sha2 = "0.11"
